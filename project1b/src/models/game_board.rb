@@ -16,7 +16,102 @@ class GameBoard
     # Note that Position pair starts from 1 to max_row/max_column
     def add_ship(ship)
         #Boundary Checking
-        puts @game_board
+        #Ship: Start Pos, Orientation, Size
+
+        ship_size = ship.size - 1 #Add to starting position for each direction
+
+        #4 Cases: UP, DOWN, LEFT, and RIGHT
+
+        #Use downto for left and down for loops to decrease col / row
+
+        #"B, -" -> Indication that we have placed a ship on the board
+
+        if ship.orientation.eql? "Up"
+            if ship.start_position.row > @max_row || ship.start_position.column > @max_column || ship.start_position.row - ship_size < 1 || ship.start_position.column < 1
+                return false
+            end
+            for x in (ship.start_position.row - 1).downto(ship.start_position.row - ship_size - 1)
+                if @game_board[x][ship.start_position.column - 1] =~ /^B/   #Already have ship
+                    return false #cannot add ship
+                end
+            end
+                
+            return add_ship_helper(ship) #Conditions checked - add ship up direction
+        end
+
+        if ship.orientation.eql? "Down"
+            if ship.start_position.row  + ship_size > @max_row || ship.start_position.column > @max_column || ship.start_position.row < 1 || ship.start_position.column < 1
+                return false
+            end
+
+            for x in ship.start_position.row - 1..ship.start_position.row - 1 + ship_size
+                if @game_board[x][ship.start_position.column - 1] =~ /^B/   #Already have ship
+                    return false #cannot add ship
+                end
+            end
+
+            return add_ship_helper(ship)
+            
+        end
+
+        if ship.orientation.eql? "Left"
+            if ship.start_position.row > @max_row || ship.start_position.column > @max_column || ship.start_position.column - ship_size < 1 || ship.start_position.row < 1
+                return False
+            end
+
+            for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
+                if @game_board[ship.start_position.row - 1][x] =~ /^B/
+                    return false
+                end
+            end
+
+            return add_ship_helper(ship)
+        end
+
+        if ship.orientation.eql? "Right"
+            if ship.start_position.row > @max_row || ship.start_position.column < 1 || ship.start_position.column + ship_size > @max_column || ship.start_position.row < 1
+                return false
+            end
+
+            for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
+                if @game_board[ship.start_position.row - 1][x] =~ /^B/
+                    return false
+                end
+            end
+
+            return add_ship_helper(ship)
+        end
+
+        return false #Invalid add ship operation
+    end
+
+    def add_ship_helper(ship)
+        ship_size = ship.size - 1
+
+        if ship.orientation.eql? "Up" #higher row to lower row
+            for x in (ship.start_position.row - 1).downto(ship.start_position.row - ship_size - 1)
+                @game_board[ship.start_position.column - 1][x] = "B, -"
+            end
+
+        end
+        if ship.orientation.eql? "Down"
+            for x in ship.start_position.row - 1..ship.start_position.row - 1 + ship_size
+                @game_board[ship.start_position.column - 1][x] = "B, -"
+            end
+        end
+
+        if ship.orientation.eql?  "Left"
+            for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
+                @game_board[ship.start_position.row - 1][x] = "B, -"
+            end
+        end
+
+        if ship.orientation.eql? "Right"
+            for x in ship.start_position.column - 1..ship.start_position.column - 1 + ship_size
+                @game_board[ship.start_position.row - 1][x] = "B, -"
+            end
+        end
+
         return true
     end
 

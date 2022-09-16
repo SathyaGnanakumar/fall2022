@@ -20,7 +20,7 @@ def read_ships_file(path)
                            #3
 
             modified[1] = modified[1].delete(", ") #All the commas are gone now
-
+            modified[2] = modified[2].delete(", ")
             #Now check the values
 
             if modified[0] =~ /([0-9]+),([0-9]+)/ && modified[1] =~ /(Up|Down|Left|Right)/ && modified[2] =~ /[1-5]/
