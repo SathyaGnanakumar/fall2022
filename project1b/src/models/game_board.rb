@@ -7,7 +7,8 @@ class GameBoard
         @max_row = max_row
         @max_column = max_column
         @successful_attacks = 0
-        @game_board = Array.new(max_row){Array.new(max_column)}
+        @game_board = Array.new(max_row){Array.new(max_column, "-, -")} #Starting position
+        @num_ships_added = 0
     end
 
     # adds a Ship object to the GameBoard
@@ -25,9 +26,8 @@ class GameBoard
         #Use downto for left and down for loops to decrease col / row
 
         #"B, -" -> Indication that we have placed a ship on the board
-
         if ship.orientation.eql? "Up"
-            if ship.start_position.row > @max_row || ship.start_position.column > @max_column || ship.start_position.row - ship_size < 1 || ship.start_position.column < 1
+            if ship.start_position.row  > @max_row || ship.start_position.column > @max_column || ship.start_position.row - ship_size < 1 || ship.start_position.column < 1
                 return false
             end
             for x in (ship.start_position.row - 1).downto(ship.start_position.row - ship_size - 1)
@@ -37,10 +37,9 @@ class GameBoard
             end
                 
             return add_ship_helper(ship) #Conditions checked - add ship up direction
-        end
 
-        if ship.orientation.eql? "Down"
-            if ship.start_position.row  + ship_size > @max_row || ship.start_position.column > @max_column || ship.start_position.row < 1 || ship.start_position.column < 1
+        elsif ship.orientation.eql? "Down"
+            if ship.start_position.row + ship_size > @max_row || ship.start_position.column > @max_column || ship.start_position.row < 1 || ship.start_position.column < 1
                 return false
             end
 
@@ -51,25 +50,9 @@ class GameBoard
             end
 
             return add_ship_helper(ship)
-            
-        end
 
-        if ship.orientation.eql? "Left"
+        elsif ship.orientation.eql? "Left"
             if ship.start_position.row > @max_row || ship.start_position.column > @max_column || ship.start_position.column - ship_size < 1 || ship.start_position.row < 1
-                return False
-            end
-
-            for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
-                if @game_board[ship.start_position.row - 1][x] =~ /^B/
-                    return false
-                end
-            end
-
-            return add_ship_helper(ship)
-        end
-
-        if ship.orientation.eql? "Right"
-            if ship.start_position.row > @max_row || ship.start_position.column < 1 || ship.start_position.column + ship_size > @max_column || ship.start_position.row < 1
                 return false
             end
 
@@ -80,9 +63,23 @@ class GameBoard
             end
 
             return add_ship_helper(ship)
-        end
 
-        return false #Invalid add ship operation
+        elsif ship.orientation.eql? "Right"
+            if ship.start_position.row > @max_row || ship.start_position.column < 1 || ship.start_position.column + ship_size > @max_column || ship.start_position.row < 1
+                return false
+            end
+
+            for x in ship.start_position.column - 1..ship.start_position.column + ship_size - 1
+                if @game_board[ship.start_position.row - 1][x] =~ /^B/
+                    return false
+                end
+            end
+
+            return add_ship_helper(ship)
+
+        else
+            return false #Invalid add ship operation
+        end
     end
 
     def add_ship_helper(ship)
@@ -92,26 +89,27 @@ class GameBoard
             for x in (ship.start_position.row - 1).downto(ship.start_position.row - ship_size - 1)
                 @game_board[ship.start_position.column - 1][x] = "B, -"
             end
-
-        end
-        if ship.orientation.eql? "Down"
+        
+        elsif ship.orientation.eql? "Down"
             for x in ship.start_position.row - 1..ship.start_position.row - 1 + ship_size
                 @game_board[ship.start_position.column - 1][x] = "B, -"
             end
-        end
 
-        if ship.orientation.eql?  "Left"
+        elsif ship.orientation.eql?  "Left"
             for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
                 @game_board[ship.start_position.row - 1][x] = "B, -"
             end
-        end
 
-        if ship.orientation.eql? "Right"
+        elsif ship.orientation.eql? "Right"
             for x in ship.start_position.column - 1..ship.start_position.column - 1 + ship_size
                 @game_board[ship.start_position.row - 1][x] = "B, -"
             end
+
+        else 
+            return false #Not of one the orientations provided
         end
 
+        @num_ships_added += 1
         return true
     end
 
@@ -129,7 +127,7 @@ class GameBoard
         #update your grid
         #Successful hit -> "B, A", Unsuccesful -> "-, A"
 
-        if(@game_board[position.row - 1][position.column - 1].eql? "B")
+        if @game_board[position.row - 1][position.column - 1] =~ /^B.*[^A]$/
             @successful_attacks += 1 #Increment counter variable 
             @game_board[position.row - 1][position.column - 1] = "B, A"
         else
@@ -139,7 +137,7 @@ class GameBoard
 
         # return whether the attack was successful or not
         # We have a hit when the pattern is "B, A"
-        if  @game_board[position.row - 1][position.column - 1] =~ /^B.*[^A]$/
+        if @game_board[position.row - 1][position.column - 1] =~ /^B/
             return true
         else
             return false
@@ -156,6 +154,10 @@ class GameBoard
     # returns True if all the ships are sunk.
     # Return false if at least one ship hasn't sunk.
     def all_sunk?
+        if @num_ships_added == 0
+            return true;
+        end
+
         for i in 0..@max_row - 1
             for j in 0..@max_column - 1
                 if @game_board[i][j] =~ /^B.*[^A]$/ #B, A pattern means sunk so
@@ -171,12 +173,6 @@ class GameBoard
 
     # String representation of GameBoard (optional but recommended)
     def to_s
-        for i in 0..@max_row - 1
-            for j in 0..@max_column - 1
-                puts "| " + @game_board[i][j] + " "  
-            end
-
-            puts "|"
-        end
+        @game_board.each {|i| puts i.to_s}
     end
 end
