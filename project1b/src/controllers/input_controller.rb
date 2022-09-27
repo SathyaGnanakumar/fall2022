@@ -19,7 +19,7 @@ def read_ships_file(path)
             break
         end
 
-        if s =~ /^\((\d+),(\d+)\), (.+), (\d)$/
+        if s =~ /^\((\d{1,}),(\d{1,})\),\s(Right|Left|Up|Down),\s(\d{1,})$/
 
             row = $1.to_i
             col = $2.to_i

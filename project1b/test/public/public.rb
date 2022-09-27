@@ -128,7 +128,7 @@ class PublicTests < MiniTest::Test
             board_p2.attack_pos(p1_moves[i])
             board_p1.attack_pos(p2_moves[i])
         end
-
+        
         assert(board_p2.all_sunk?, "P1 should have sunk all P2 Boats")
         refute(board_p1.all_sunk?, "P2 should not have sunk all P1 Boats")
     end

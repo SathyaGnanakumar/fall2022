@@ -56,7 +56,7 @@ class GameBoard
                 return false
             end
 
-            for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
+            for x in (ship.start_position.column - 1).downto(ship.start_position.column - 1 + ship_size)
                 if @game_board[ship.start_position.row - 1][x] =~ /^B/
                     return false
                 end
@@ -69,7 +69,7 @@ class GameBoard
                 return false
             end
 
-            for x in ship.start_position.column - 1..ship.start_position.column + ship_size - 1
+            for x in ship.start_position.column - 1..ship.start_position.column - 1 + ship_size 
                 if @game_board[ship.start_position.row - 1][x] =~ /^B/
                     return false
                 end
@@ -86,17 +86,17 @@ class GameBoard
         ship_size = ship.size - 1
 
         if ship.orientation.eql? "Up" #higher row to lower row
-            for x in (ship.start_position.row - 1).downto(ship.start_position.row - ship_size - 1)
-                @game_board[ship.start_position.column - 1][x] = "B, -"
+            for x in (ship.start_position.row - 1).downto(ship.start_position.row -  1 - ship_size)
+                @game_board[x][ship.start_position.column - 1] = "B, -"
             end
         
         elsif ship.orientation.eql? "Down"
             for x in ship.start_position.row - 1..ship.start_position.row - 1 + ship_size
-                @game_board[ship.start_position.column - 1][x] = "B, -"
+                @game_board[x][ship.start_position.column - 1] = "B, -"
             end
 
         elsif ship.orientation.eql?  "Left"
-            for x in (ship.start_position.column - 1).downto(ship.start_position.column - ship_size - 1)
+            for x in (ship.start_position.column - 1).downto(ship.start_position.column - 1 - ship_size)
                 @game_board[ship.start_position.row - 1][x] = "B, -"
             end
 
@@ -154,10 +154,6 @@ class GameBoard
     # returns True if all the ships are sunk.
     # Return false if at least one ship hasn't sunk.
     def all_sunk?
-        if @num_ships_added == 0
-            return true;
-        end
-
         for i in 0..@max_row - 1
             for j in 0..@max_column - 1
                 if @game_board[i][j] =~ /^B.*[^A]$/ #B, A pattern means sunk so
