@@ -1,25 +1,21 @@
 class Rectangle
-    @@area = Hash.new(0)
+    @@area = {}
+
     def initialize(length, width)
         @length = length
         @width = width
-
-        @@area[@length * @width] += 1
+        if length*width in @@area.keys then
+            @@area[length*width] += 1 
+        else
+            @@area[length*width] = 1
+        end
     end
 
     def getArea()
-        @length * @width
+        return @length*@width
     end
 
     def self.getNumRectangles(n)
-        count = 0
-
-        for k, v in @@area
-            if k < n
-                count += v
-            end
-        end
-
-        return count
+        # iterate through hash, if key is < n, then add v to the counter
     end
 end
