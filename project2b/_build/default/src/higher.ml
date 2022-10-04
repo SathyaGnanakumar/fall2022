@@ -16,8 +16,6 @@ let count_occ lst target =
 let uniq lst = 
     fold(fun a x -> if contains_elem a x then a else x::a) [] lst
 
-let assoc_list lst = 
-    let a_list = uniq lst (* Get the unique list first to work with *)
-    fold
+let assoc_list lst = failwith "unimplemented"
 
 let ap fns args = failwith "unimplemented"
